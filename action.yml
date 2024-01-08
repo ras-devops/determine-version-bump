@@ -1,0 +1,27 @@
+name: "GitHub Version"
+description: "Bump version"
+author: "Aliaksandr Ryzhou"
+outputs:
+  sha:
+    description: "The current sha of the code"
+  sha_short:
+    description: "The current sha short of the code"
+  new_version:
+    description: "The new version of the application"
+  previous_version:
+    description: "The previous version of the application"
+inputs:
+  current_version:
+    description: "Required for permission to tag the repo."
+    required: true
+  list_labels_file_path:
+    description: "List os labels from the PR to define what we have to do with version"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - run: ${{ github.action_path }}/scripts/determine_bump.sh ${{ inputs.current_version }} ${{ inputs.list_labels_file_path }}
+      shell: bash
+branding:
+  icon: "git-merge"
+  color: "green"
