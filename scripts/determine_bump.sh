@@ -1,6 +1,6 @@
 #!/bin/bash
 current_version=$1
-labels=$2
+labels=$(cat $2)
 validate_version() {
   local version="$1"
   regex="^v?([0-9]+\.){2}[0-9]+(-[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*)?(\+[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*)?$"
@@ -12,7 +12,7 @@ validate_version() {
     exit 1
   fi
 }
-
+:
 validate_version "$current_version"
 # Determine the bump type (major, minor, patch, or build)
 if [[ $labels == *"bump:major"* ]]; then
