@@ -69,7 +69,12 @@ fi
 # Bump major, minor, or patch version based on the determined bump type
 case $bump_type in
 "major")
-  new_version=$(echo $current_version | awk -F. '{print $1 + 1 ".0.0"}')
+  if [[ $current_version == v* ]]; then
+    major_version=$(echo $current_version | sed -E 's/^v([0-9]+).*$/\1/')
+    new_version="v$((major_version + 1)).0.0"
+  else
+    new_version=$(echo $current_version | awk -F. '{print $1 + 1 ".0.0"}')
+  fi
   ;;
 "minor")
   new_version=$(echo $current_version | awk -F. '{print $1 "." $2 + 1 ".0"}')
