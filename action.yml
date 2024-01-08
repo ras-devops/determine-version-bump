@@ -4,12 +4,16 @@ author: "Aliaksandr Ryzhou"
 outputs:
   sha:
     description: "The current sha of the code"
+    value: ${{ steps.run_script.outputs.sha }}
   sha_short:
     description: "The current sha short of the code"
+    value: ${{ steps.run_script.outputs.sha_short }}
   new_version:
     description: "The new version of the application"
+    value: ${{ steps.run_script.outputs.new_version }}
   previous_version:
     description: "The previous version of the application"
+    value: ${{ steps.run_script.outputs.previous_version }}
 inputs:
   current_version:
     description: "Required for permission to tag the repo."
@@ -20,7 +24,8 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: |
+    - id: run_script
+      run: |
         chmod +x ${{ github.action_path }}/scripts/determine_bump.sh
         ${{ github.action_path }}/scripts/determine_bump.sh ${{ inputs.current_version }} ${{ inputs.list_labels_file_patch }}
       shell: bash
