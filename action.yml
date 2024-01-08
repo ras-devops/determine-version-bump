@@ -14,13 +14,13 @@ inputs:
   current_version:
     description: "Required for permission to tag the repo."
     required: true
-  list_labels:
+  list_labels_file_patch:
     description: "List os labels from the PR to define what we have to do with version"
     required: true
 runs:
   using: "composite"
   steps:
-    - run: ${{ github.action_path }}/scripts/determine_bump.sh ${{ inputs.current_version }} ${{ inputs.list_labels }}
+    - run: ${{ github.action_path }}/scripts/determine_bump.sh ${{ inputs.current_version }} ${{ inputs.list_labels_file_patch }}
       shell: bash
 branding:
   icon: "git-merge"
