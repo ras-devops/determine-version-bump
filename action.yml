@@ -1,4 +1,4 @@
-name: "GitHub Version"
+name: "Semantic Custom Version Bumping"
 description: "Bump version"
 author: "Aliaksandr Ryzhou"
 outputs:
