@@ -20,7 +20,9 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: ${{ github.action_path }}/scripts/determine_bump.sh ${{ inputs.current_version }} ${{ inputs.list_labels_file_patch }}
+    - run: |
+        git update-index --chmod=+x ${{ github.action_path }}/scripts/determine_bump.sh
+        ${{ github.action_path }}/scripts/determine_bump.sh ${{ inputs.current_version }} ${{ inputs.list_labels_file_patch }}
       shell: bash
 branding:
   icon: "git-merge"
