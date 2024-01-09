@@ -33,6 +33,66 @@ build_number=$(echo $current_version | sed -n 's/.*-'"$prerelease_label"'\.\([0-
 echo "prerelease_label: $prerelease_label"
 echo "build_number: $build_number"
 
+# If prerelease labels are present, prioritize them
+if [ -n "$labels" ]; then
+  if ([[ $bump_type == "major" || $bump_type == "minor" || $bump_type == "patch" ]]) && [[ $labels == *"pre:alpha"* ]]; then
+    prerelease_type="alpha"
+  elif ([[ $bump_type == "major" || $bump_type == "minor" || $bump_type == "patch" ]]) && [[ $labels == *"pre:beta"* ]]; then
+    prerelease_type="beta"
+  elif ([[ $bump_type == "major" || $bump_type == "minor" || $bump_type == "patch" ]]) && [[ $labels == *"pre:demo"* ]]; then
+    prerelease_type="demo"
+  elif [[ $labels == *"pre:demo"* ]]; then
+    prerelease_type="demo"
+  elif [[ $labels == *"pre:beta"* ]] && [[ $prerelease_label == "demo" ]]; then
+    prerelease_type="demo"
+  elif [[ $labels == *"pre:alpha"* ]] && [[ $prerelease_label == "demo" ]]; then
+    prerelease_type="demo"
+  elif [[ $labels == *"pre:alpha"* ]] && [[ $prerelease_label == "beta" ]]; then
+    prerelease_type="beta"
+  elif [[ $labels == *"pre:beta"* ]] && ([[ $prerelease_label == "beta" ]] || [[ -z $prerelease_label ]]); then
+    prerelease_type="beta"
+  elif [[ $labels == *"pre:alpha"* ]] && [[ $prerelease_label != *"pre:beta"* ]] && [[ $prerelease_label != *"pre:demo"* ]]; then
+    prerelease_type="alpha"
+  fi
+fi
+
+echo "prerelease_type $prerelease_type"
+
+###############################################
+if [[ $bump_type == "major" ]] && [[ "$prerelease_type" == "alpha" ]]; then
+  bump_type="major_alpha"
+elif [[ $bump_type == "minor" ]] && [[ "$prerelease_type" == "alpha" ]]; then
+  bump_type="minor_alpha"
+elif [[ $bump_type == "patch" ]] && [[ "$prerelease_type" == "alpha" ]]; then
+  bump_type="patch_alpha"
+elif [[ $bump_type == "major" ]] && [[ "$prerelease_type" == "beta" ]]; then
+  bump_type="major_beta"
+elif [[ $bump_type == "minor" ]] && [[ "$prerelease_type" == "beta" ]]; then
+  bump_type="minor_beta"
+elif [[ $bump_type == "patch" ]] && [[ "$prerelease_type" == "beta" ]]; then
+  bump_type="patch_beta"
+elif [[ $bump_type == "major" ]] && [[ "$prerelease_type" == "demo" ]]; then
+  bump_type="major_demo"
+elif [[ $bump_type == "minor" ]] && [[ "$prerelease_type" == "demo" ]]; then
+  bump_type="minor_demo"
+elif [[ $bump_type == "patch" ]] && [[ "$prerelease_type" == "demo" ]]; then
+  bump_type="patch_demo"
+elif [[ $bump_type == "build" ]] && [[ "$prerelease_type" == "alpha" ]] && [[ -z $prerelease_label ]]; then
+  bump_type="build_alpha"
+elif [[ $bump_type == "build" ]] && [[ "$prerelease_type" == "beta" ]] && [[ -z $prerelease_label ]]; then
+  bump_type="build_beta"
+elif [[ $bump_type == "build" ]] && [[ "$prerelease_type" == "demo" ]] && [[ -z $prerelease_label ]]; then
+  bump_type="build_demo"
+else
+  echo "No two types of labels"
+fi
+
+if [[ -z "$prerelease_label" ]] && [[ $bump_type == "build" ]] && [[ -z $prerelease_type ]]; then
+  bump_type="patch_alpha"
+fi
+
+echo "Bump type is $bump_type"
+
 # If there are no labels and no prerelease part, create prerelease alpha with build number 0
 if [ -z "$labels" ] && [ -z "$prerelease_label" ]; then
   new_prerelease_label="alpha"
@@ -53,8 +113,10 @@ if [ -n "$labels" ]; then
     new_prerelease_label="demo"
   elif [[ $labels == *"pre:alpha"* ]] && [[ $prerelease_label == "beta" ]]; then
     new_prerelease_label="beta"
-  elif [[ $labels == *"pre:beta"* ]] ; then
+  elif [[ $labels == *"pre:beta"* ]]; then
     new_prerelease_label="beta"
+  elif [[ $labels == *"pre:alpha"* ]]; then
+    new_prerelease_label="alpha"
   fi
 fi
 
@@ -82,13 +144,64 @@ case $bump_type in
 "patch")
   new_version=$(echo $current_version | awk -F. '{print $1 "." $2 "." $3 + 1}')
   ;;
+"major_alpha")
+  if [[ $current_version == v* ]]; then
+    major_version=$(echo $current_version | sed -E 's/^v([0-9]+).*$/\1/')
+    new_version="v$((major_version + 1)).0.0-alpha.0"
+  else
+    new_version=$(echo $current_version | awk -F. '{print $1 + 1 ".0.0"}')
+  fi
+  ;;
+"minor_alpha")
+  new_version=$(echo $current_version | awk -F. '{print $1 "." $2 + 1 ".0"}')-alpha.0
+  ;;
+"patch_alpha")
+  new_version=$(echo $current_version | awk -F. '{print $1 "." $2 "." $3 + 1}')-alpha.0
+  ;;
+"major_beta")
+  if [[ $current_version == v* ]]; then
+    major_version=$(echo $current_version | sed -E 's/^v([0-9]+).*$/\1/')
+    new_version="v$((major_version + 1)).0.0-beta.0"
+  else
+    new_version=$(echo $current_version | awk -F. '{print $1 + 1 ".0.0"}')
+  fi
+  ;;
+"minor_beta")
+  new_version=$(echo $current_version | awk -F. '{print $1 "." $2 + 1 ".0"}')-beta.0
+  ;;
+"patch_beta")
+  new_version=$(echo $current_version | awk -F. '{print $1 "." $2 "." $3 + 1}')-beta.0
+  ;;
+"major_demo")
+  if [[ $current_version == v* ]]; then
+    major_version=$(echo $current_version | sed -E 's/^v([0-9]+).*$/\1/')
+    new_version="v$((major_version + 1)).0.0-demo.0"
+  else
+    new_version=$(echo $current_version | awk -F. '{print $1 + 1 ".0.0"}')
+  fi
+  ;;
+"minor_demo")
+  new_version=$(echo $current_version | awk -F. '{print $1 "." $2 + 1 ".0"}')-demo.0
+  ;;
+"patch_demo")
+  new_version=$(echo $current_version | awk -F. '{print $1 "." $2 "." $3 + 1}')-demo.0
+  ;;
+"build_alpha")
+  new_version=$(echo $current_version | awk -F. '{print $1 "." $2 "." $3 + 1}')-alpha.0
+  ;;
+"build_beta")
+  new_version=$(echo $current_version | awk -F. '{print $1 "." $2 "." $3 + 1}')-beta.0
+  ;;
+"build_demo")
+  new_version=$(echo $current_version | awk -F. '{print $1 "." $2 "." $3 + 1}')-demo.0
+  ;;
 "build")
   # If there are prerelease labels, include them in the new version
-  if [ -n "$prerelease_label" ] && [ -n "$new_build_number" ] ; then
+  if [ -n "$prerelease_label" ] && [ -n "$new_build_number" ]; then
     new_version="${current_version%-*}-$prerelease_label.$new_build_number"
   elif [ -n "$prerelease_label" ] && [ "$new_prerelease_label" == "$prerelease_label" ]; then
     new_version="${current_version%-*}-$prerelease_label.$build_number"
-  elif [ -n "$prerelease_label" ] && [ -z "$new_prerelease_label" ] ; then
+  elif [ -n "$prerelease_label" ] && [ -z "$new_prerelease_label" ]; then
     new_version="${current_version%-*}-$prerelease_label.$((build_number + 1))"
   else
     new_version="${current_version%-*}.$build_number"
