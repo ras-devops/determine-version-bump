@@ -3,7 +3,7 @@ version=$1
 labels=$(cat $2)
 
 prerelease_suffix=$(echo $version | awk -F- '{print $2}' | awk -F. '{print $1}')
-# echo "prerelease_suffix $prerelease_suffix"
+echo "prerelease_suffix $prerelease_suffix"
 
 if [[ $labels == *"bump:major"* ]] && [[ $labels == *"pre:demo"* ]]; then
   bump_type="major_demo"
@@ -52,7 +52,7 @@ else
   bump_type="build"
 fi
 
-# echo $bump_type
+echo $bump_type
 
 generate_semver_command() {
   case $bump_type in
@@ -117,21 +117,21 @@ generate_semver_command() {
     echo "semver bump prerel alpha $first_alpha"
     ;;
   "demo_prerelease_suffix")
-    if [[ $prerelease_suffix == *"demo"* ]]; then
-      echo "semver bump prerel $version"
-    else
+    if [[ $prerelease_suffix == *"beta"* ]] || [[ $prerelease_suffix == *"alpha"* ]]; then
       echo "semver bump prerel demo $version"
+    elif [[ $prerelease_suffix == *"demo"* ]]; then
+      echo "semver bump prerel $version"
     fi
     ;;
   "beta_prerelease_suffix")
-    if [[ $prerelease_suffix == *"beta"* ]]; then
+    if [[ $prerelease_suffix == *"beta"* ]] || [[ $prerelease_suffix == *"demo"* ]]; then
       echo "semver bump prerel $version"
     else
       echo "semver bump prerel beta $version"
     fi
     ;;
   "alpha_prerelease_suffix")
-    if [[ $prerelease_suffix == *"alpha"* ]]; then
+    if [[ $prerelease_suffix == *"alpha"* ]] || [[ $prerelease_suffix == *"demo"* ]] || [[ $prerelease_suffix == *"beta"* ]] ; then
       echo "semver bump prerel $version"
     else
       echo "semver bump prerel alpha $version"
