@@ -57,7 +57,11 @@ echo $bump_type
 generate_semver_command() {
   case $bump_type in
   "release")
-    echo "semver bump release $version"
+    if [[ -z $prerelease_suffix ]]; then
+      echo "semver bump patch $version"
+    else
+      echo "semver bump release $version"
+    fi
     ;;
   "major_demo")
     first_major_demo=$(semver bump major $version)
@@ -131,7 +135,7 @@ generate_semver_command() {
     fi
     ;;
   "alpha_prerelease_suffix")
-    if [[ $prerelease_suffix == *"alpha"* ]] || [[ $prerelease_suffix == *"demo"* ]] || [[ $prerelease_suffix == *"beta"* ]] ; then
+    if [[ $prerelease_suffix == *"alpha"* ]] || [[ $prerelease_suffix == *"demo"* ]] || [[ $prerelease_suffix == *"beta"* ]]; then
       echo "semver bump prerel $version"
     else
       echo "semver bump prerel alpha $version"
