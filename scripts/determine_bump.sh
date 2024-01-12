@@ -173,5 +173,5 @@ echo "New Version: $new_version"
 echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 echo "new_version=$new_version" >> $GITHUB_OUTPUT
-echo "current_version=$version" >> $GITHUB_OUTPUT
-echo "current_tag_or_commit=$current_tag_or_commit" >> $GITHUB_OUTPUT
+echo "current_version=$current_tag_or_commit" >> $GITHUB_OUTPUT
+echo "previous_version=$version" >> $GITHUB_OUTPUT
