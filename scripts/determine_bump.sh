@@ -1,6 +1,6 @@
 #!/bin/bash
 version=$1
-labels=$2
+labels=$(cat $2)
 
 prerelease_suffix=$(echo $version | awk -F- '{print $2}' | awk -F. '{print $1}')
 echo "prerelease_suffix $prerelease_suffix"
