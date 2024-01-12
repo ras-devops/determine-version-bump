@@ -164,7 +164,9 @@ first_command=$(generate_semver_command "$labels" "$version")
 new_version=v$(eval "$first_command")
 echo "sha=$(git rev-parse HEAD)"
 echo "sha_short=$(git rev-parse --short HEAD)"
-echo "Current Version: $version"
+echo "current_tag_or_commit=$(git describe --exact-match --tags 2> /dev/null || git rev-parse --short HEAD)"
+
+echo "Previous Version: $version"
 echo "Labels attached to the Pull Request: $labels"
 echo "New Version: $new_version"
 
@@ -172,3 +174,4 @@ echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 echo "new_version=$new_version" >> $GITHUB_OUTPUT
 echo "current_version=$version" >> $GITHUB_OUTPUT
+echo "current_tag_or_commit=$current_tag_or_commit" >> $GITHUB_OUTPUT
