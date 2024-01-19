@@ -1,5 +1,26 @@
 #!/bin/bash
-version=$1
+
+#!/bin/bash
+
+# Get the latest tag for the current commit if it exists
+latest_tag=$(git describe --exact-match --tags 2>/dev/null)
+
+if [ -z "$latest_tag" ]; then
+    echo "No exact match tag found for the current commit."
+    # If there is no tag for the current commit, get the latest tag for the branch
+    latest_tag=$(git describe --tags --abbrev=0)
+    echo "Latest tag for the branch: $latest_tag"
+    # Set the variable to indicate the need to bump the version
+    bump_version=true
+else
+    echo "Exact match tag found for the current commit: $latest_tag"
+    # Set the variable to indicate no need to bump the version
+    bump_version=false
+fi
+
+echo "Bump version required: $bump_version"
+
+version=$latest_tag
 labels=$(cat $2)
 
 prerelease_suffix=$(echo $version | awk -F- '{print $2}' | awk -F. '{print $1}')
@@ -162,16 +183,24 @@ get_prerelease_label() {
 # Generate and execute the first semver command
 first_command=$(generate_semver_command "$labels" "$version")
 new_version=v$(eval "$first_command")
+
 echo "sha=$(git rev-parse HEAD)"
 echo "sha_short=$(git rev-parse --short HEAD)"
 echo "current_tag_or_commit=$(git describe --exact-match --tags 2> /dev/null || git rev-parse --short HEAD)"
-
 echo "Previous Version: $version"
 echo "Labels attached to the Pull Request: $labels"
-echo "New Version: $new_version"
+echo "An Actual Tag or a commit for a state of this repository: $current_tag_or_commit"
 
+# Additional actions if bump_version is true
+if [ "$bump_version" = true ]; then
+    echo "New Version: $new_version"
+    echo "new_version=$new_version" >> $GITHUB_OUTPUT
+  else
+    echo "Possible New Version: $new_version"
+    echo "new_version=$current_tag_or_commit" >> $GITHUB_OUTPUT
+
+fi
 echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-echo "new_version=$new_version" >> $GITHUB_OUTPUT
 echo "current_version=$current_tag_or_commit" >> $GITHUB_OUTPUT
 echo "previous_version=$version" >> $GITHUB_OUTPUT
