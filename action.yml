@@ -1,4 +1,4 @@
-name: "Semantic Custom Version Bumping depending on PR labels"
+name: "Custom Version Bumping"
 description: "Bump version"
 author: "Aliaksandr Ryzhou"
 outputs:
