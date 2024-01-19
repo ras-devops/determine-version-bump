@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
-
 # Get the latest tag for the current commit if it exists
 latest_tag=$(git describe --exact-match --tags 2>/dev/null)
 
