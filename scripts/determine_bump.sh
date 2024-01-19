@@ -195,7 +195,7 @@ if [ "$bump_version" = true ]; then
     echo "new_version=$new_version" >> $GITHUB_OUTPUT
   else
     echo "Possible New Version: $new_version"
-    echo "new_version=$current_tag_or_commit" >> $GITHUB_OUTPUT
+    echo "new_version=$version" >> $GITHUB_OUTPUT
 
 fi
 echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
