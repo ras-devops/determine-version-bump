@@ -24,20 +24,20 @@ labels=$(cat $2)
 prerelease_suffix=$(echo $version | awk -F- '{print $2}' | awk -F. '{print $1}')
 echo "prerelease_suffix $prerelease_suffix"
 
-if [[ $labels == *"bump:major"* ]] && [[ $labels == *"pre:demo"* ]]; then
-  bump_type="major_demo"
+if [[ $labels == *"bump:major"* ]] && [[ $labels == *"pre:rc"* ]]; then
+  bump_type="major_rc"
 elif [[ $labels == *"bump:major"* ]] && [[ $labels == *"pre:beta"* ]]; then
   bump_type="major_beta"
 elif [[ $labels == *"bump:major"* ]] && [[ $labels == *"pre:alpha"* ]]; then
   bump_type="major_alpha"
-elif [[ $labels == *"bump:minor"* ]] && [[ $labels == *"pre:demo"* ]]; then
-  bump_type="minor_demo"
+elif [[ $labels == *"bump:minor"* ]] && [[ $labels == *"pre:rc"* ]]; then
+  bump_type="minor_rc"
 elif [[ $labels == *"bump:minor"* ]] && [[ $labels == *"pre:beta"* ]]; then
   bump_type="minor_beta"
 elif [[ $labels == *"bump:minor"* ]] && [[ $labels == *"pre:alpha"* ]]; then
   bump_type="minor_alpha"
-elif [[ $labels == *"bump:patch"* ]] && [[ $labels == *"pre:demo"* ]]; then
-  bump_type="patch_demo"
+elif [[ $labels == *"bump:patch"* ]] && [[ $labels == *"pre:rc"* ]]; then
+  bump_type="patch_rc"
 elif [[ $labels == *"bump:patch"* ]] && [[ $labels == *"pre:beta"* ]]; then
   bump_type="patch_beta"
 elif [[ $labels == *"bump:patch"* ]] && [[ $labels == *"pre:alpha"* ]]; then
@@ -50,14 +50,14 @@ elif [[ $labels == *"bump:patch"* ]]; then
   bump_type="patch"
 elif [[ $labels == *"bump:release"* ]]; then
   bump_type="release"
-elif [[ $labels == *"pre:demo"* ]] && [[ -z $prerelease_suffix ]]; then
-  bump_type="demo"
+elif [[ $labels == *"pre:rc"* ]] && [[ -z $prerelease_suffix ]]; then
+  bump_type="rc"
 elif [[ $labels == *"pre:beta"* ]] && [[ -z $prerelease_suffix ]]; then
   bump_type="beta"
 elif [[ $labels == *"pre:alpha"* ]] && [[ -z $prerelease_suffix ]]; then
   bump_type="alpha"
-elif [[ $labels == *"pre:demo"* ]] && [[ -n $prerelease_suffix ]]; then
-  bump_type="demo_prerelease_suffix"
+elif [[ $labels == *"pre:rc"* ]] && [[ -n $prerelease_suffix ]]; then
+  bump_type="rc_prerelease_suffix"
 elif [[ $labels == *"pre:beta"* ]] && [[ -n $prerelease_suffix ]]; then
   bump_type="beta_prerelease_suffix"
 elif [[ $labels == *"pre:alpha"* ]] && [[ -n $prerelease_suffix ]]; then
@@ -82,9 +82,9 @@ generate_semver_command() {
       echo "semver bump release $version"
     fi
     ;;
-  "major_demo")
-    first_major_demo=$(semver bump major $version)
-    echo "semver bump prerel demo $first_major_demo"
+  "major_rc")
+    first_major_rc=$(semver bump major $version)
+    echo "semver bump prerel rc $first_major_rc"
     ;;
   "major_beta")
     first_major_beta=$(semver bump major $version)
@@ -94,9 +94,9 @@ generate_semver_command() {
     first_major_alpha=$(semver bump major $version)
     echo "semver bump prerel alpha $first_major_alpha"
     ;;
-  "minor_demo")
-    first_minor_demo=$(semver bump minor $version)
-    echo "semver bump prerel demo $first_minor_demo"
+  "minor_rc")
+    first_minor_rc=$(semver bump minor $version)
+    echo "semver bump prerel rc $first_minor_rc"
     ;;
   "minor_beta")
     first_minor_beta=$(semver bump minor $version)
@@ -106,9 +106,9 @@ generate_semver_command() {
     first_minor_alpha=$(semver bump minor $version)
     echo "semver bump prerel alpha $first_minor_alpha"
     ;;
-  "patch_demo")
-    first_patch_demo=$(semver bump patch $version)
-    echo "semver bump prerel demo $first_patch_demo"
+  "patch_rc")
+    first_patch_rc=$(semver bump patch $version)
+    echo "semver bump prerel rc $first_patch_rc"
     ;;
   "patch_beta")
     first_patch_beta=$(semver bump patch $version)
@@ -127,9 +127,9 @@ generate_semver_command() {
   "patch")
     echo "semver bump patch $version"
     ;;
-  "demo")
-    first_demo=$(semver bump patch $version)
-    echo "semver bump prerel demo $first_demo"
+  "rc")
+    first_rc=$(semver bump patch $version)
+    echo "semver bump prerel rc $first_rc"
     ;;
   "beta")
     first_beta=$(semver bump patch $version)
@@ -139,22 +139,22 @@ generate_semver_command() {
     first_alpha=$(semver bump patch $version)
     echo "semver bump prerel alpha $first_alpha"
     ;;
-  "demo_prerelease_suffix")
+  "rc_prerelease_suffix")
     if [[ $prerelease_suffix == *"beta"* ]] || [[ $prerelease_suffix == *"alpha"* ]]; then
-      echo "semver bump prerel demo $version"
-    elif [[ $prerelease_suffix == *"demo"* ]]; then
+      echo "semver bump prerel rc $version"
+    elif [[ $prerelease_suffix == *"rc"* ]]; then
       echo "semver bump prerel $version"
     fi
     ;;
   "beta_prerelease_suffix")
-    if [[ $prerelease_suffix == *"beta"* ]] || [[ $prerelease_suffix == *"demo"* ]]; then
+    if [[ $prerelease_suffix == *"beta"* ]] || [[ $prerelease_suffix == *"rc"* ]]; then
       echo "semver bump prerel $version"
     else
       echo "semver bump prerel beta $version"
     fi
     ;;
   "alpha_prerelease_suffix")
-    if [[ $prerelease_suffix == *"alpha"* ]] || [[ $prerelease_suffix == *"demo"* ]] || [[ $prerelease_suffix == *"beta"* ]]; then
+    if [[ $prerelease_suffix == *"alpha"* ]] || [[ $prerelease_suffix == *"rc"* ]] || [[ $prerelease_suffix == *"beta"* ]]; then
       echo "semver bump prerel $version"
     else
       echo "semver bump prerel alpha $version"
