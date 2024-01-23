@@ -196,8 +196,8 @@ if [ "$bump_version" = true ] && ([ "$GITHUB_REF" = "refs/heads/main" ] || [ "$G
     echo "New Version: $new_version"
     echo "new_version=$new_version" >> $GITHUB_OUTPUT
 elif [ "$bump_version" = true ] && ([ "$GITHUB_REF" != "refs/heads/main" ] || [ "$GITHUB_REF" != "refs/heads/next" ]); then
-    echo "New Version: $new_version-$sha_short Beacuse it's not main/next branch "
-    echo "new_version=$new_version-$sha_short" >> $GITHUB_OUTPUT
+    echo "New Version: $version-$sha_short Because it's not main/next branch "
+    echo "new_version=$version-$sha_short" >> $GITHUB_OUTPUT
 else
     echo "Possible New Version: $new_version"
     echo "new_version=$version" >> $GITHUB_OUTPUT
