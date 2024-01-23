@@ -181,6 +181,8 @@ get_prerelease_label() {
 # Generate and execute the first semver command
 first_command=$(generate_semver_command "$labels" "$version")
 new_version=v$(eval "$first_command")
+sha=$(git rev-parse HEAD)
+sha_short=$(git rev-parse --short HEAD)
 
 echo "sha=$(git rev-parse HEAD)"
 echo "sha_short=$(git rev-parse --short HEAD)"
@@ -190,13 +192,15 @@ echo "Labels attached to the Pull Request: $labels"
 echo "An Actual Tag or a commit for a state of this repository: $current_tag_or_commit"
 
 # Additional actions if bump_version is true
-if [ "$bump_version" = true ]; then
+if [ "$bump_version" = true ] && ([ "$GITHUB_REF" = "refs/heads/main" ] || [ "$GITHUB_REF" = "refs/heads/next" ]); then
     echo "New Version: $new_version"
     echo "new_version=$new_version" >> $GITHUB_OUTPUT
-  else
+elif [ "$bump_version" = true ] && ([ "$GITHUB_REF" != "refs/heads/main" ] || [ "$GITHUB_REF" != "refs/heads/next" ]); then
+    echo "New Version: $new_version-$sha_short Beacuse it's not main/next branch "
+    echo "new_version=$new_version-$sha_short" >> $GITHUB_OUTPUT
+else
     echo "Possible New Version: $new_version"
     echo "new_version=$version" >> $GITHUB_OUTPUT
-
 fi
 echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
